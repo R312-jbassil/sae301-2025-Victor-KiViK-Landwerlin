@@ -322,46 +322,45 @@ fetch('/src/assets/lunettes-base.svg')
 	})
 	.catch(err => console.error('Erreur chargement SVG:', err));
 
+// ✅ CORRECTION : Cibler le FILL (remplissage) au lieu du STROKE (contour)
 function applySVGConfig() {
 	const svgEl = document.querySelector('#svg-container svg');
 	if (!svgEl) return;
 	
-	// Couleur monture
-	svgEl.querySelectorAll('.cls-4').forEach(path => {
-		path.style.stroke = config.color;
-		path.style.fill = 'none';
-	});
-	
-	// Branches
+	// Branches - modifier le FILL (remplissage) au lieu du stroke
 	const branches = svgEl.querySelector('#branches');
 	if (branches) {
 		branches.querySelectorAll('path').forEach(path => {
 			if (path.classList.contains('cls-4')) {
-				path.style.stroke = config.color;
+				path.style.fill = config.color; // ✅ Remplissage, pas contour
+				path.style.stroke = '#1d1d1b'; // Contour noir fixe
+				path.style.strokeWidth = '0.5px';
 			} else if (path.classList.contains('cls-1')) {
 				path.style.fill = config.color;
-				path.style.opacity = '0.2';
+				path.style.opacity = '0.3';
 			}
 		});
 	}
 	
-	// Monture principale
+	// Monture principale - modifier le FILL
 	const monture = svgEl.querySelector('#monture');
 	if (monture) {
 		monture.querySelectorAll('path').forEach(path => {
 			if (path.classList.contains('cls-4')) {
-				path.style.stroke = config.color;
-				path.style.strokeWidth = '1.5px';
+				path.style.fill = config.color; // ✅ Remplissage
+				path.style.stroke = '#1d1d1b'; // Contour noir fixe
+				path.style.strokeWidth = '0.5px';
 			}
 		});
 	}
 	
-	// Verres
+	// Verres - avec opacité variable
 	const verres = svgEl.querySelector('#verres');
 	if (verres) {
 		verres.querySelectorAll('path').forEach(path => {
 			path.style.fill = config.color;
 			path.style.opacity = config.lensOpacity;
+			path.style.stroke = 'none';
 		});
 	}
 }
@@ -449,7 +448,7 @@ document.querySelectorAll('.lens-btn').forEach(btn => {
 	});
 });
 
-// SAUVEGARDE CORRIGÉE
+// SAUVEGARDE
 document.getElementById('save-config-btn')?.addEventListener('click', async () => {
 	const nom = prompt("Donnez un nom à votre création :");
 	if (!nom) return;
@@ -464,7 +463,7 @@ document.getElementById('save-config-btn')?.addEventListener('click', async () =
 		const response = await fetch('/api/saveLunettes', {
 			method: 'POST',
 			headers: { 'Content-Type': 'application/json' },
-			credentials: 'include', // Important pour les cookies
+			credentials: 'include',
 			body: JSON.stringify({
 				nom: nom,
 				materiau: config.material,
@@ -493,7 +492,7 @@ document.getElementById('save-config-btn')?.addEventListener('click', async () =
 	}
 });
 
-// GÉNÉRATION IA CORRIGÉE
+// GÉNÉRATION IA
 document.getElementById('ai-generate-btn')?.addEventListener('click', async () => {
 	const prompt = document.getElementById('ai-prompt').value;
 	if (!prompt.trim()) {
@@ -569,10 +568,5 @@ document.getElementById('ai-generate-btn')?.addEventListener('click', async () =
 		btn.disabled = false;
 		btn.textContent = 'Générer avec l\'IA';
 	}
-});
-
-// Nudge sauvegarde
-document.querySelector('#nudge-save button')?.addEventListener('click', () => {
-	document.getElementById('save-config-btn')?.click();
 });
 </script>

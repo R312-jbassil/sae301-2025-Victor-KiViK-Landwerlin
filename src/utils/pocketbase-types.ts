@@ -1,40 +1,67 @@
-export type LunettesRecord = {
-	name?: string
-	code_svg?: string
-	chat_history?: string
-	materiau?: string
-	couleur?: string
-	pont?: number
-	taille_verres?: number
-	type_verres?: string
-	user?: string
-	created?: IsoDateString
-	id: string
-	updated?: IsoDateString
-}
+/**
+ * This file was @generated using pocketbase-typegen
+ */
 
-export type LunettesResponse<Texpand = unknown> = Required<LunettesRecord> & BaseSystemFields<Texpand>
+import type PocketBase from 'pocketbase';
+import type { RecordService } from 'pocketbase';
 
-// Ajouter dans Collections enum
 export enum Collections {
-	// ... existants
 	Lunettes = "lunettes",
+	Users = "users",
 }
 
-// Ajouter dans CollectionRecords
+// Base types
+type IsoDateString = string;
+
+export type BaseSystemFields<T = never> = {
+	id: string;
+	created: IsoDateString;
+	updated: IsoDateString;
+	collectionId: string;
+	collectionName: Collections;
+	expand?: T;
+};
+
+// Lunettes Record
+export type LunettesRecord = {
+	nom?: string;
+	materiau?: string;
+	couleur?: string;
+	pont?: number;
+	verres?: number;
+	type_verre?: string;
+	svg_data?: string;
+	prix?: number;
+	user?: string;
+};
+
+export type LunettesResponse<Texpand = unknown> = Required<LunettesRecord> & BaseSystemFields<Texpand>;
+
+// Users Record
+export type UsersRecord = {
+	name?: string;
+	avatar?: string;
+	email: string;
+	emailVisibility?: boolean;
+	verified?: boolean;
+};
+
+export type UsersResponse<Texpand = unknown> = Required<UsersRecord> & BaseSystemFields<Texpand>;
+
+// Collection Records & Responses
 export type CollectionRecords = {
-	// ... existants
-	lunettes: LunettesRecord
-}
+	lunettes: LunettesRecord;
+	users: UsersRecord;
+};
 
-// Ajouter dans CollectionResponses
 export type CollectionResponses = {
-	// ... existants
-	lunettes: LunettesResponse
-}
+	lunettes: LunettesResponse;
+	users: UsersResponse;
+};
 
-// Ajouter dans TypedPocketBase
+// Typed PocketBase
 export type TypedPocketBase = PocketBase & {
-	// ... existants
-	collection(idOrName: 'lunettes'): RecordService<LunettesResponse>
-}
+	collection(idOrName: 'lunettes'): RecordService<LunettesResponse>;
+	collection(idOrName: 'users'): RecordService<UsersResponse>;
+	collection(idOrName: string): RecordService;
+};
