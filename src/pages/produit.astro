@@ -1,0 +1,163 @@
+---
+import Layout from '../layouts/Layout.astro';
+import Header from '../components/Header.astro';
+---
+
+<Layout title="Modèle Minimaliste - TaVue" description="Découvrez notre modèle Minimaliste en acétate français. Fabrication artisanale parisienne.">
+	<Header currentPage="modeles" />
+	
+	<main class="p-20 bg-blanc-casse">
+		<!-- Breadcrumb -->
+		<nav class="text-sm text-gris-taupe mb-8">
+			<a href="/" class="hover:text-bleu-marine transition-colors">Accueil</a>
+			<span class="mx-2">/</span>
+			<a href="/modeles" class="hover:text-bleu-marine transition-colors">Mes créations</a>
+			<span class="mx-2">/</span>
+			<span class="text-bleu-marine">Modèle Minimaliste</span>
+		</nav>
+		
+		<!-- Grille principale -->
+		<div class="grid grid-cols-2 gap-20 mb-20">
+			<!-- Visuel produit -->
+			<div class="card p-16 flex items-center justify-center">
+				<div id="product-svg" class="w-full max-w-[600px]">
+					<!-- SVG sera injecté ici -->
+				</div>
+			</div>
+			
+			<!-- Informations produit -->
+			<div>
+				<!-- Badge -->
+				<span class="inline-block bg-brun-clair text-white text-xs font-semibold uppercase tracking-wider px-3 py-1.5 rounded-md mb-6">
+					Édition limitée
+				</span>
+				
+				<h1 class="text-4xl font-semibold text-bleu-marine mb-4">Modèle Minimaliste</h1>
+				<p class="text-3xl font-semibold text-brun-clair mb-6">189 €</p>
+				
+				<p class="text-gris-taupe leading-relaxed mb-8">
+					Une monture fine en acétate français, pensée pour allier élégance et discrétion. 
+					Chaque paire est assemblée à la main dans notre atelier parisien. Le pont de 18 mm 
+					et les verres de 52 mm garantissent un confort optimal tout au long de la journée.
+				</p>
+				
+				<!-- Caractéristiques -->
+				<div class="bg-beige-lin p-6 rounded-xl mb-8">
+					<h3 class="text-sm font-semibold uppercase tracking-wider text-bleu-marine mb-4">Caractéristiques</h3>
+					<div class="space-y-3">
+						<div class="flex justify-between py-3 border-b border-brun-clair/20">
+							<span class="text-gris-taupe">Matériau</span>
+							<span class="font-semibold text-bleu-marine">Acétate français</span>
+						</div>
+						<div class="flex justify-between py-3 border-b border-brun-clair/20">
+							<span class="text-gris-taupe">Largeur du pont</span>
+							<span class="font-semibold text-bleu-marine">18 mm</span>
+						</div>
+						<div class="flex justify-between py-3 border-b border-brun-clair/20">
+							<span class="text-gris-taupe">Taille des verres</span>
+							<span class="font-semibold text-bleu-marine">52 mm</span>
+						</div>
+						<div class="flex justify-between py-3 border-b border-brun-clair/20">
+							<span class="text-gris-taupe">Couleur</span>
+							<span class="font-semibold text-bleu-marine">Bleu marine</span>
+						</div>
+						<div class="flex justify-between py-3">
+							<span class="text-gris-taupe">Origine</span>
+							<span class="font-semibold text-bleu-marine">Fabriqué à Paris</span>
+						</div>
+					</div>
+				</div>
+				
+				<!-- Boutons d'action -->
+				<div class="grid grid-cols-[2fr_1fr] gap-4 mb-8">
+					<button class="btn-primary py-4 flex items-center justify-center gap-2">
+						<svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+							<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 3h2l.4 2M7 13h10l4-8H5.4M7 13L5.4 5M7 13l-2.293 2.293c-.63.63-.184 1.707.707 1.707H17m0 0a2 2 0 100 4 2 2 0 000-4zm-8 2a2 2 0 11-4 0 2 2 0 014 0z"/>
+						</svg>
+						Ajouter au panier
+					</button>
+					<button class="border-2 border-bleu-marine text-bleu-marine py-4 rounded-lg hover:bg-bleu-marine hover:text-white transition-all">
+						Reconfigurer
+					</button>
+				</div>
+				
+				<!-- Preuve sociale -->
+				<div class="bg-beige-lin p-6 rounded-xl flex items-center gap-4">
+					<div class="text-4xl">⭐</div>
+					<div>
+						<p class="text-lg font-semibold text-bleu-marine">98% de satisfaction</p>
+						<p class="text-sm text-gris-taupe">Plus de 2 400 clients conquis depuis 2023</p>
+					</div>
+				</div>
+			</div>
+		</div>
+		
+		<!-- Section variantes IA -->
+		<section class="border-t-2 border-beige-lin pt-16">
+			<h2 class="text-3xl font-semibold text-bleu-marine mb-3">L'IA a créé ces variantes pour toi</h2>
+			<p class="text-gris-taupe mb-8">Populaires cette semaine auprès des utilisateurs similaires</p>
+			
+			<div class="grid grid-cols-3 gap-8">
+				<!-- Variante 1 -->
+				<div class="card p-6 hover:-translate-y-1 transition-transform duration-300 cursor-pointer">
+					<span class="inline-block bg-brun-clair text-white text-xs font-semibold uppercase tracking-wider px-2 py-1 rounded mb-2">
+						⭐ Populaire
+					</span>
+					<div class="bg-blanc-casse p-6 rounded-xl mb-4 h-[200px] flex items-center justify-center">
+						<div class="w-[200px] h-[80px] bg-[#8B4513] rounded-full opacity-20"></div>
+					</div>
+					<h3 class="text-lg font-semibold text-bleu-marine mb-2">Style Parisien Rétro</h3>
+					<p class="text-sm text-gris-taupe mb-4">Acétate écaille clair, pont 19 mm, monture vintage</p>
+					<button class="w-full py-3 bg-beige-lin text-bleu-marine rounded-lg hover:bg-bleu-marine hover:text-white transition-all font-semibold">
+						Appliquer ce style
+					</button>
+				</div>
+				
+				<!-- Variante 2 -->
+				<div class="card p-6 hover:-translate-y-1 transition-transform duration-300 cursor-pointer">
+					<span class="inline-block bg-brun-clair text-white text-xs font-semibold uppercase tracking-wider px-2 py-1 rounded mb-2">
+						🔥 Tendance
+					</span>
+					<div class="bg-blanc-casse p-6 rounded-xl mb-4 h-[200px] flex items-center justify-center">
+						<div class="w-[200px] h-[80px] bg-[#2C5F2D] rounded-full opacity-20"></div>
+					</div>
+					<h3 class="text-lg font-semibold text-bleu-marine mb-2">Design Unisexe Nature</h3>
+					<p class="text-sm text-gris-taupe mb-4">Tons neutres vert sapin, bio-acétate, esprit atelier français</p>
+					<button class="w-full py-3 bg-beige-lin text-bleu-marine rounded-lg hover:bg-bleu-marine hover:text-white transition-all font-semibold">
+						Appliquer ce style
+					</button>
+				</div>
+				
+				<!-- Variante 3 -->
+				<div class="card p-6 hover:-translate-y-1 transition-transform duration-300 cursor-pointer">
+					<div class="h-6 mb-2"></div>
+					<div class="bg-blanc-casse p-6 rounded-xl mb-4 h-[200px] flex items-center justify-center">
+						<div class="w-[200px] h-[80px] bg-[#6E6B65] rounded-full opacity-20"></div>
+					</div>
+					<h3 class="text-lg font-semibold text-bleu-marine mb-2">Minimaliste Métallique</h3>
+					<p class="text-sm text-gris-taupe mb-4">Titane gris taupe, ultra-léger, design épuré</p>
+					<button class="w-full py-3 bg-beige-lin text-bleu-marine rounded-lg hover:bg-bleu-marine hover:text-white transition-all font-semibold">
+						Appliquer ce style
+					</button>
+				</div>
+			</div>
+		</section>
+	</main>
+</Layout>
+
+<script>
+	// Import du SVG
+	fetch('/src/assets/lunettes-base.svg')
+		.then(r => r.text())
+		.then(svg => {
+			document.getElementById('product-svg').innerHTML = svg;
+			
+			// Appliquer la couleur bleu marine
+			const svgEl = document.querySelector('#product-svg svg');
+			if (svgEl) {
+				svgEl.querySelectorAll('.cls-4').forEach(path => {
+					path.style.stroke = '#1C2A39';
+				});
+			}
+		});
+</script>

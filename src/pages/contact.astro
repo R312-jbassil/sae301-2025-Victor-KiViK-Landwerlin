@@ -1,0 +1,62 @@
+---
+import Layout from '../layouts/Layout.astro';
+import Header from '../components/Header.astro';
+---
+
+<Layout title="Contact - TaVue" description="Contactez-nous pour toute question sur nos lunettes personnalisées.">
+	<Header currentPage="contact" />
+	
+	<main class="p-20 bg-blanc-casse min-h-[calc(100vh-100px)]">
+		<div class="max-w-4xl mx-auto">
+			<h1 class="text-4xl font-semibold text-bleu-marine mb-3">Contactez-nous</h1>
+			<p class="text-gris-taupe mb-12">Une question ? Notre équipe vous répond sous 24h</p>
+			
+			<div class="grid grid-cols-2 gap-12">
+				<!-- Formulaire -->
+				<div>
+					<form class="space-y-6">
+						<div>
+							<label class="block text-sm font-medium text-bleu-marine mb-2">Nom complet</label>
+							<input type="text" placeholder="Jean Dupont" class="input-field" required />
+						</div>
+						
+						<div>
+							<label class="block text-sm font-medium text-bleu-marine mb-2">Email</label>
+							<input type="email" placeholder="jean@email.fr" class="input-field" required />
+						</div>
+						
+						<div>
+							<label class="block text-sm font-medium text-bleu-marine mb-2">Message</label>
+							<textarea rows="6" placeholder="Votre message..." class="input-field resize-none" required></textarea>
+						</div>
+						
+						<button type="submit" class="btn-primary w-full py-4">
+							Envoyer le message
+						</button>
+					</form>
+				</div>
+				
+				<!-- Informations -->
+				<div class="space-y-8">
+					<div class="card p-6">
+						<h3 class="text-lg font-semibold text-bleu-marine mb-4">Nos coordonnées</h3>
+						<div class="space-y-3 text-gris-taupe">
+							<p>📍 12 Rue de la Paix, 75002 Paris</p>
+							<p>📞 +33 1 23 45 67 89</p>
+							<p>✉️ contact@tavue.fr</p>
+						</div>
+					</div>
+					
+					<div class="card p-6">
+						<h3 class="text-lg font-semibold text-bleu-marine mb-4">Horaires d'ouverture</h3>
+						<div class="space-y-2 text-gris-taupe text-sm">
+							<p>Lundi - Vendredi : 10h - 19h</p>
+							<p>Samedi : 11h - 18h</p>
+							<p>Dimanche : Fermé</p>
+						</div>
+					</div>
+				</div>
+			</div>
+		</div>
+	</main>
+</Layout>

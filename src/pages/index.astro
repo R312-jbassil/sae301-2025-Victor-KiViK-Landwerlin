@@ -1,11 +1,28 @@
 ---
-import Welcome from '../components/Welcome.astro';
 import Layout from '../layouts/Layout.astro';
-
-// Welcome to Astro! Wondering what to do next? Check out the Astro documentation at https://docs.astro.build
-// Don't want to use any of this? Delete everything in this file, the `assets`, `components`, and `layouts` directories, and start fresh.
+import Header from '../components/Header.astro';
 ---
 
-<Layout>
-	<Welcome />
+<Layout title="TaVue - Lunettes sur mesure" description="Créez vos lunettes personnalisées avec notre configurateur en ligne. Fabrication française, style raffiné.">
+	<Header currentPage="home" />
+	
+	<main class="min-h-[calc(100vh-100px)] flex items-center justify-center">
+		<div class="text-center max-w-4xl px-8">
+			<h1 class="text-6xl font-semibold text-bleu-marine mb-6">
+				Créez vos lunettes<br />sur mesure
+			</h1>
+			<p class="text-xl text-gris-taupe mb-12 leading-relaxed">
+				Personnalisez chaque détail de votre monture avec notre configurateur innovant.<br />
+				Fabrication française, style raffiné, qualité exceptionnelle.
+			</p>
+			<div class="flex gap-6 justify-center">
+				<a href="/configurateur" class="btn-primary text-lg px-8 py-4">
+					Commencer ma création
+				</a>
+				<a href="/modeles" class="border-2 border-bleu-marine text-bleu-marine px-8 py-4 rounded-lg hover:bg-bleu-marine hover:text-white transition-all duration-300 text-lg">
+					Voir nos modèles
+				</a>
+			</div>
+		</div>
+	</main>
 </Layout>

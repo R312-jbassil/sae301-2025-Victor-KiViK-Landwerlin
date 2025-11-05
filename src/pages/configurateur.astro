@@ -1,0 +1,396 @@
+---
+import Layout from '../layouts/Layout.astro';
+import Header from '../components/Header.astro';
+---
+
+<Layout title="Configurateur - TaVue" description="Personnalisez votre paire de lunettes en temps réel avec notre configurateur intuitif.">
+	<Header currentPage="configurateur" />
+	
+	<main class="p-20 bg-gradient-to-br from-blanc-casse to-beige-lin min-h-[calc(100vh-100px)]">
+		<div class="grid grid-cols-2 gap-20">
+			<!-- COLONNE GAUCHE : Visualisation 3D/SVG -->
+			<div class="flex flex-col gap-8">
+				<div class="card p-16 flex items-center justify-center min-h-[500px]">
+					<div id="svg-container" class="w-full max-w-[600px]">
+						<!-- Le SVG sera injecté ici via JavaScript -->
+					</div>
+				</div>
+				
+				<!-- Contrôles de vue -->
+				<div class="flex gap-4 justify-center">
+					<button class="px-6 py-3 bg-white rounded-lg border-2 border-gris-taupe hover:border-bleu-marine transition-colors">
+						Vue de face
+					</button>
+					<button class="px-6 py-3 bg-white rounded-lg border-2 border-gris-taupe hover:border-bleu-marine transition-colors">
+						Vue de profil
+					</button>
+				</div>
+			</div>
+			
+			<!-- COLONNE DROITE : Options de configuration -->
+			<div class="flex flex-col gap-8">
+				<!-- Stepper -->
+				<div class="flex items-center justify-between mb-4">
+					<div class="step active" data-step="1">
+						<div class="step-circle">1</div>
+						<span>Matériau</span>
+					</div>
+					<div class="step-line"></div>
+					<div class="step" data-step="2">
+						<div class="step-circle">2</div>
+						<span>Couleur</span>
+					</div>
+					<div class="step-line"></div>
+					<div class="step" data-step="3">
+						<div class="step-circle">3</div>
+						<span>Dimensions</span>
+					</div>
+					<div class="step-line"></div>
+					<div class="step" data-step="4">
+						<div class="step-circle">4</div>
+						<span>Verres</span>
+					</div>
+					<div class="step-line"></div>
+					<div class="step" data-step="5">
+						<div class="step-circle">5</div>
+						<span>Finalisation</span>
+					</div>
+				</div>
+				
+				<!-- Panneau de configuration -->
+				<div class="card p-8 flex-1">
+					<h2 class="text-2xl font-semibold text-bleu-marine mb-6">Personnalisez votre monture</h2>
+					
+					<!-- Section 1 : Matériau -->
+					<div class="config-section" data-section="1">
+						<h3 class="text-lg font-medium text-bleu-marine mb-4">Matériau de la monture</h3>
+						<div class="grid grid-cols-2 gap-4">
+							<button class="material-btn active" data-material="acetate">
+								<span class="font-medium">Acétate</span>
+								<span class="text-sm text-gris-taupe">Classique</span>
+							</button>
+							<button class="material-btn" data-material="metal">
+								<span class="font-medium">Métal</span>
+								<span class="text-sm text-gris-taupe">Léger</span>
+							</button>
+							<button class="material-btn" data-material="bois">
+								<span class="font-medium">Bois</span>
+								<span class="text-sm text-gris-taupe">Naturel</span>
+							</button>
+							<button class="material-btn" data-material="bio">
+								<span class="font-medium">Bio-acétate</span>
+								<span class="text-sm text-gris-taupe">Écologique</span>
+							</button>
+						</div>
+					</div>
+					
+					<!-- Section 2 : Couleurs -->
+					<div class="config-section hidden" data-section="2">
+						<h3 class="text-lg font-medium text-bleu-marine mb-4">Couleur de la monture</h3>
+						<div class="flex gap-3 flex-wrap">
+							<button class="color-btn active" data-color="#1C2A39" style="background: #1C2A39" title="Bleu marine"></button>
+							<button class="color-btn" data-color="#BFA58A" style="background: #BFA58A" title="Brun clair"></button>
+							<button class="color-btn" data-color="#6E6B65" style="background: #6E6B65" title="Gris taupe"></button>
+							<button class="color-btn" data-color="#8B4513" style="background: #8B4513" title="Écaille"></button>
+							<button class="color-btn" data-color="#2C5F2D" style="background: #2C5F2D" title="Vert sapin"></button>
+							<button class="color-btn" data-color="#C19A6B" style="background: #C19A6B" title="Camel"></button>
+							<button class="color-btn" data-color="#000000" style="background: #000000" title="Noir"></button>
+							<button class="color-btn" data-color="#F5F1E8" style="background: #F5F1E8; border: 2px solid #BFA58A" title="Beige"></button>
+						</div>
+					</div>
+					
+					<!-- Section 3 : Dimensions -->
+					<div class="config-section hidden" data-section="3">
+						<h3 class="text-lg font-medium text-bleu-marine mb-4">Dimensions</h3>
+						<div class="space-y-6">
+							<div>
+								<label class="block text-sm font-medium mb-2">Largeur du pont (mm)</label>
+								<input type="range" min="14" max="22" value="18" class="range range-primary" id="pont-width">
+								<div class="flex justify-between text-xs text-gris-taupe mt-1">
+									<span>14</span>
+									<span id="pont-value">18</span>
+									<span>22</span>
+								</div>
+							</div>
+							<div>
+								<label class="block text-sm font-medium mb-2">Taille des verres (mm)</label>
+								<input type="range" min="48" max="56" value="52" class="range range-primary" id="verre-size">
+								<div class="flex justify-between text-xs text-gris-taupe mt-1">
+									<span>48</span>
+									<span id="verre-value">52</span>
+									<span>56</span>
+								</div>
+							</div>
+						</div>
+					</div>
+					
+					<!-- Section 4 : Verres -->
+					<div class="config-section hidden" data-section="4">
+						<h3 class="text-lg font-medium text-bleu-marine mb-4">Type de verres</h3>
+						<div class="space-y-4">
+							<button class="lens-btn active" data-lens="transparent">
+								<span class="font-medium">Transparents</span>
+								<span class="text-sm text-gris-taupe">Vision standard</span>
+							</button>
+							<button class="lens-btn" data-lens="teinte">
+								<span class="font-medium">Teintés</span>
+								<span class="text-sm text-gris-taupe">Protection solaire</span>
+							</button>
+							<button class="lens-btn" data-lens="polarise">
+								<span class="font-medium">Polarisés</span>
+								<span class="text-sm text-gris-taupe">Anti-reflets</span>
+							</button>
+						</div>
+					</div>
+					
+					<!-- Section 5 : Finalisation -->
+					<div class="config-section hidden" data-section="5">
+						<h3 class="text-lg font-medium text-bleu-marine mb-4">Récapitulatif</h3>
+						<div class="space-y-3 bg-beige-lin p-6 rounded-lg mb-6">
+							<div class="flex justify-between">
+								<span class="text-gris-taupe">Matériau:</span>
+								<span class="font-medium" id="recap-material">Acétate</span>
+							</div>
+							<div class="flex justify-between">
+								<span class="text-gris-taupe">Couleur:</span>
+								<span class="font-medium" id="recap-color">Bleu marine</span>
+							</div>
+							<div class="flex justify-between">
+								<span class="text-gris-taupe">Pont:</span>
+								<span class="font-medium" id="recap-pont">18 mm</span>
+							</div>
+							<div class="flex justify-between">
+								<span class="text-gris-taupe">Verres:</span>
+								<span class="font-medium" id="recap-verre">52 mm</span>
+							</div>
+							<div class="flex justify-between">
+								<span class="text-gris-taupe">Type de verre:</span>
+								<span class="font-medium" id="recap-lens">Transparents</span>
+							</div>
+							<div class="border-t border-brun-clair mt-4 pt-4 flex justify-between text-xl">
+								<span class="font-semibold">Prix:</span>
+								<span class="font-semibold text-brun-clair">189 €</span>
+							</div>
+						</div>
+					</div>
+					
+					<!-- Navigation buttons -->
+					<div class="flex gap-4 mt-8">
+						<button id="prev-btn" class="flex-1 py-3 border-2 border-bleu-marine text-bleu-marine rounded-lg hover:bg-bleu-marine hover:text-white transition-all disabled:opacity-50 disabled:cursor-not-allowed" disabled>
+							Précédent
+						</button>
+						<button id="next-btn" class="flex-1 btn-primary py-3">
+							Suivant
+						</button>
+					</div>
+				</div>
+				
+				<!-- Section IA -->
+				<div class="card p-6 bg-gradient-to-r from-beige-lin to-blanc-casse">
+					<h3 class="text-lg font-medium text-bleu-marine mb-4 flex items-center gap-3">
+						<svg class="w-5 h-5" fill="currentColor" viewBox="0 0 20 20">
+							<path d="M10 3.5a1.5 1.5 0 013 0V4a1 1 0 001 1h3a1 1 0 011 1v3a1 1 0 01-1 1h-.5a1.5 1.5 0 000 3h.5a1 1 0 011 1v3a1 1 0 01-1 1h-3a1 1 0 01-1-1v-.5a1.5 1.5 0 00-3 0v.5a1 1 0 01-1 1H6a1 1 0 01-1-1v-3a1 1 0 00-1-1h-.5a1.5 1.5 0 010-3H4a1 1 0 001-1V6a1 1 0 011-1h3a1 1 0 001-1v-.5z"/>
+						</svg>
+						Configurer avec l'IA
+					</h3>
+					<p class="text-sm text-gris-taupe mb-4">Décrivez vos lunettes idéales en langage naturel</p>
+					<textarea 
+						class="w-full p-3 border border-brun-clair rounded-lg resize-none focus:border-bleu-marine focus:ring-2 focus:ring-bleu-marine focus:ring-opacity-20" 
+						rows="3" 
+						placeholder="Ex: Je veux une monture ronde en métal doré avec des verres teintés bleus..."
+					></textarea>
+					<button class="w-full mt-3 btn-secondary py-2">
+						Générer avec l'IA
+					</button>
+				</div>
+			</div>
+		</div>
+		
+		<!-- Nudge sticky en bas à droite -->
+		<div class="fixed bottom-8 right-8 card p-6 max-w-sm shadow-2xl animate-slide-in" id="nudge-save">
+			<div class="flex items-start gap-4">
+				<div class="text-3xl">💡</div>
+				<div>
+					<h4 class="font-semibold text-bleu-marine mb-1">Ta création t'attend !</h4>
+					<p class="text-sm text-gris-taupe mb-3">Enregistre-la en 1 minute pour ne pas la perdre.</p>
+					<button class="btn-primary py-2 px-4 text-sm w-full">
+						Enregistrer ma création
+					</button>
+				</div>
+				<button class="text-gris-taupe hover:text-bleu-marine" onclick="document.getElementById('nudge-save').style.display='none'">
+					<svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+						<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/>
+					</svg>
+				</button>
+			</div>
+		</div>
+	</main>
+</Layout>
+
+<style>
+	/* Stepper styles */
+	.step {
+		@apply flex flex-col items-center text-center;
+	}
+	
+	.step-circle {
+		@apply w-10 h-10 rounded-full border-2 border-gris-taupe flex items-center justify-center text-gris-taupe font-medium transition-all;
+	}
+	
+	.step.active .step-circle {
+		@apply bg-bleu-marine border-bleu-marine text-white;
+	}
+	
+	.step-line {
+		@apply flex-1 h-0.5 bg-gris-taupe/30;
+	}
+	
+	.step span {
+		@apply text-xs text-gris-taupe font-medium;
+	}
+	
+	.step.active span {
+		@apply text-bleu-marine;
+	}
+	
+	/* Material buttons */
+	.material-btn {
+		@apply flex flex-col items-center gap-1 p-4 border-2 border-gray-200 rounded-lg hover:border-bleu-marine transition-all cursor-pointer bg-white;
+	}
+	
+	.material-btn.active {
+		@apply border-bleu-marine bg-blue-50;
+	}
+	
+	/* Color buttons */
+	.color-btn {
+		@apply w-12 h-12 rounded-full border-2 border-transparent hover:scale-110 transition-transform cursor-pointer;
+	}
+	
+	.color-btn.active {
+		@apply ring-4 ring-bleu-marine ring-offset-2;
+	}
+	
+	/* Lens buttons */
+	.lens-btn {
+		@apply flex flex-col gap-1 p-4 border-2 border-gray-200 rounded-lg hover:border-bleu-marine transition-all cursor-pointer bg-white w-full text-left;
+	}
+	
+	.lens-btn.active {
+		@apply border-bleu-marine bg-blue-50;
+	}
+	
+	/* Animations */
+	@keyframes slide-in {
+		from {
+			transform: translateX(400px);
+			opacity: 0;
+		}
+		to {
+			transform: translateX(0);
+			opacity: 1;
+		}
+	}
+	
+	.animate-slide-in {
+		animation: slide-in 0.5s ease-out 2s both;
+	}
+</style>
+
+<script>
+	// Import du SVG
+	fetch('/src/assets/lunettes-base.svg')
+		.then(r => r.text())
+		.then(svg => {
+			document.getElementById('svg-container').innerHTML = svg;
+		});
+	
+	// Gestion du stepper
+	let currentStep = 1;
+	const totalSteps = 5;
+	
+	function updateStep(step) {
+		// Update stepper visual
+		document.querySelectorAll('.step').forEach((el, index) => {
+			if (index + 1 <= step) {
+				el.classList.add('active');
+			} else {
+				el.classList.remove('active');
+			}
+		});
+		
+		// Update sections
+		document.querySelectorAll('.config-section').forEach(section => {
+			section.classList.add('hidden');
+		});
+		document.querySelector(`[data-section="${step}"]`)?.classList.remove('hidden');
+		
+		// Update buttons
+		document.getElementById('prev-btn').disabled = step === 1;
+		document.getElementById('next-btn').textContent = step === totalSteps ? 'Enregistrer' : 'Suivant';
+	}
+	
+	document.getElementById('next-btn')?.addEventListener('click', () => {
+		if (currentStep < totalSteps) {
+			currentStep++;
+			updateStep(currentStep);
+		} else {
+			// Save logic
+			alert('Sauvegarde de la configuration !');
+		}
+	});
+	
+	document.getElementById('prev-btn')?.addEventListener('click', () => {
+		if (currentStep > 1) {
+			currentStep--;
+			updateStep(currentStep);
+		}
+	});
+	
+	// Gestion des boutons matériaux
+	document.querySelectorAll('.material-btn').forEach(btn => {
+		btn.addEventListener('click', () => {
+			document.querySelectorAll('.material-btn').forEach(b => b.classList.remove('active'));
+			btn.classList.add('active');
+			document.getElementById('recap-material').textContent = btn.querySelector('.font-medium').textContent;
+		});
+	});
+	
+	// Gestion des couleurs
+	document.querySelectorAll('.color-btn').forEach(btn => {
+		btn.addEventListener('click', () => {
+			document.querySelectorAll('.color-btn').forEach(b => b.classList.remove('active'));
+			btn.classList.add('active');
+			const color = btn.getAttribute('data-color');
+			document.getElementById('recap-color').textContent = btn.getAttribute('title');
+			
+			// Update SVG color
+			const svg = document.querySelector('#svg-container svg');
+			if (svg) {
+				svg.querySelectorAll('.cls-4').forEach(path => {
+					path.style.stroke = color;
+				});
+			}
+		});
+	});
+	
+	// Gestion des ranges
+	document.getElementById('pont-width')?.addEventListener('input', (e) => {
+		document.getElementById('pont-value').textContent = e.target.value;
+		document.getElementById('recap-pont').textContent = e.target.value + ' mm';
+	});
+	
+	document.getElementById('verre-size')?.addEventListener('input', (e) => {
+		document.getElementById('verre-value').textContent = e.target.value;
+		document.getElementById('recap-verre').textContent = e.target.value + ' mm';
+	});
+	
+	// Gestion des verres
+	document.querySelectorAll('.lens-btn').forEach(btn => {
+		btn.addEventListener('click', () => {
+			document.querySelectorAll('.lens-btn').forEach(b => b.classList.remove('active'));
+			btn.classList.add('active');
+			document.getElementById('recap-lens').textContent = btn.querySelector('.font-medium').textContent;
+		});
+	});
+</script>

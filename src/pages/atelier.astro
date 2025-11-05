@@ -1,0 +1,110 @@
+---
+import Layout from '../layouts/Layout.astro';
+import Header from '../components/Header.astro';
+---
+
+<Layout title="L'atelier - TaVue" description="Découvrez notre atelier parisien et notre savoir-faire artisanal dans la fabrication de lunettes.">
+	<Header currentPage="atelier" />
+	
+	<main class="bg-blanc-casse">
+		<!-- Hero section -->
+		<section class="px-20 py-32 text-center bg-gradient-to-br from-beige-lin to-blanc-casse">
+			<h1 class="text-5xl font-semibold text-bleu-marine mb-6">Notre atelier parisien</h1>
+			<p class="text-xl text-gris-taupe max-w-3xl mx-auto leading-relaxed">
+				Depuis 2020, nous créons des lunettes sur mesure dans notre atelier situé au cœur de Paris. 
+				Chaque paire est assemblée à la main avec passion et précision.
+			</p>
+		</section>
+		
+		<!-- Notre philosophie -->
+		<section class="px-20 py-20">
+			<div class="max-w-6xl mx-auto">
+				<h2 class="text-3xl font-semibold text-bleu-marine mb-12 text-center">Notre philosophie</h2>
+				
+				<div class="grid grid-cols-3 gap-12">
+					<div class="text-center">
+						<div class="w-20 h-20 bg-beige-lin rounded-full flex items-center justify-center mx-auto mb-6 text-3xl">
+							🇫🇷
+						</div>
+						<h3 class="text-xl font-semibold text-bleu-marine mb-3">Fabrication française</h3>
+						<p class="text-gris-taupe">Tous nos matériaux sont sourcés localement et nos lunettes sont entièrement fabriquées en France.</p>
+					</div>
+					
+					<div class="text-center">
+						<div class="w-20 h-20 bg-beige-lin rounded-full flex items-center justify-center mx-auto mb-6 text-3xl">
+							✋
+						</div>
+						<h3 class="text-xl font-semibold text-bleu-marine mb-3">Artisanat</h3>
+						<p class="text-gris-taupe">Chaque paire est assemblée à la main par nos artisans qualifiés avec un soin méticuleux.</p>
+					</div>
+					
+					<div class="text-center">
+						<div class="w-20 h-20 bg-beige-lin rounded-full flex items-center justify-center mx-auto mb-6 text-3xl">
+							🌱
+						</div>
+						<h3 class="text-xl font-semibold text-bleu-marine mb-3">Durabilité</h3>
+						<p class="text-gris-taupe">Nous privilégions des matériaux écologiques et durables pour un impact environnemental minimal.</p>
+					</div>
+				</div>
+			</div>
+		</section>
+		
+		<!-- Le processus -->
+		<section class="px-20 py-20 bg-beige-lin">
+			<div class="max-w-4xl mx-auto">
+				<h2 class="text-3xl font-semibold text-bleu-marine mb-12 text-center">Notre processus de fabrication</h2>
+				
+				<div class="space-y-12">
+					<div class="flex gap-8 items-start">
+						<div class="w-12 h-12 bg-bleu-marine text-white rounded-full flex items-center justify-center font-bold flex-shrink-0">
+							1
+						</div>
+						<div>
+							<h3 class="text-xl font-semibold text-bleu-marine mb-2">Sélection des matériaux</h3>
+							<p class="text-gris-taupe">Nous choisissons minutieusement chaque matériau : acétate français premium, titane léger, ou bois naturel.</p>
+						</div>
+					</div>
+					
+					<div class="flex gap-8 items-start">
+						<div class="w-12 h-12 bg-bleu-marine text-white rounded-full flex items-center justify-center font-bold flex-shrink-0">
+							2
+						</div>
+						<div>
+							<h3 class="text-xl font-semibold text-bleu-marine mb-2">Découpe et façonnage</h3>
+							<p class="text-gris-taupe">Les montures sont découpées avec précision et façonnées selon vos spécifications personnalisées.</p>
+						</div>
+					</div>
+					
+					<div class="flex gap-8 items-start">
+						<div class="w-12 h-12 bg-bleu-marine text-white rounded-full flex items-center justify-center font-bold flex-shrink-0">
+							3
+						</div>
+						<div>
+							<h3 class="text-xl font-semibold text-bleu-marine mb-2">Assemblage artisanal</h3>
+							<p class="text-gris-taupe">Nos artisans assemblent chaque élément à la main, garantissant une finition parfaite.</p>
+						</div>
+					</div>
+					
+					<div class="flex gap-8 items-start">
+						<div class="w-12 h-12 bg-bleu-marine text-white rounded-full flex items-center justify-center font-bold flex-shrink-0">
+							4
+						</div>
+						<div>
+							<h3 class="text-xl font-semibold text-bleu-marine mb-2">Contrôle qualité</h3>
+							<p class="text-gris-taupe">Chaque paire est rigoureusement testée et vérifiée avant d'être expédiée.</p>
+						</div>
+					</div>
+				</div>
+			</div>
+		</section>
+		
+		<!-- CTA -->
+		<section class="px-20 py-20 text-center">
+			<h2 class="text-3xl font-semibold text-bleu-marine mb-6">Prêt à créer vos lunettes ?</h2>
+			<p class="text-gris-taupe mb-8">Commencez dès maintenant à personnaliser votre paire unique</p>
+			<a href="/configurateur" class="btn-primary inline-block text-lg px-12 py-4">
+				Créer mes lunettes
+			</a>
+		</section>
+	</main>
+</Layout>

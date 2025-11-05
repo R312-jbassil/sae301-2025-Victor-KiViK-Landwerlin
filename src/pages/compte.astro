@@ -1,0 +1,151 @@
+---
+import Layout from '../layouts/Layout.astro';
+import Header from '../components/Header.astro';
+---
+
+<Layout title="Mon compte - TaVue" description="Connectez-vous pour accéder à vos créations et gérer votre compte.">
+	<Header currentPage="compte" />
+	
+	<main class="min-h-[calc(100vh-100px)] bg-gradient-to-br from-blanc-casse to-beige-lin flex items-center justify-center p-16">
+		<div class="card w-full max-w-[500px] overflow-hidden">
+			<!-- Onglets -->
+			<div class="flex border-b border-beige-lin">
+				<button 
+					class="tab-btn active flex-1 py-4 text-center font-medium transition-all" 
+					data-tab="connexion"
+				>
+					Connexion
+				</button>
+				<button 
+					class="tab-btn flex-1 py-4 text-center font-medium transition-all" 
+					data-tab="inscription"
+				>
+					Créer un compte
+				</button>
+			</div>
+			
+			<!-- Contenu Connexion -->
+			<div class="p-12 tab-content" id="connexion-content">
+				<h2 class="text-3xl font-semibold text-bleu-marine mb-3">Bienvenue.</h2>
+				<p class="text-gris-taupe mb-8">Connecte-toi pour retrouver tes créations</p>
+				
+				<form class="space-y-6">
+					<div>
+						<label class="block text-sm font-medium text-bleu-marine mb-2">Adresse email</label>
+						<input 
+							type="email" 
+							placeholder="ton@email.fr" 
+							class="input-field"
+							required
+						/>
+					</div>
+					
+					<div>
+						<label class="block text-sm font-medium text-bleu-marine mb-2">Mot de passe</label>
+						<input 
+							type="password" 
+							placeholder="••••••••" 
+							class="input-field"
+							required
+						/>
+					</div>
+					
+					<button type="submit" class="btn-primary w-full py-4 mt-3">
+						Se connecter
+					</button>
+				</form>
+				
+				<!-- Nudge -->
+				<div class="mt-6 bg-beige-lin p-4 rounded-lg text-center">
+					<p class="text-sm font-semibold text-bleu-marine mb-1">💡 Ta création t'attend !</p>
+					<p class="text-sm text-gris-taupe">Enregistre-la en 1 minute pour ne pas la perdre.</p>
+				</div>
+			</div>
+			
+			<!-- Contenu Inscription -->
+			<div class="p-12 tab-content hidden" id="inscription-content">
+				<h2 class="text-3xl font-semibold text-bleu-marine mb-3">Rejoins-nous.</h2>
+				<p class="text-gris-taupe mb-8">Crée ton compte en 1 minute</p>
+				
+				<form class="space-y-6">
+					<div>
+						<label class="block text-sm font-medium text-bleu-marine mb-2">Nom complet</label>
+						<input 
+							type="text" 
+							placeholder="Jean Dupont" 
+							class="input-field"
+							required
+						/>
+					</div>
+					
+					<div>
+						<label class="block text-sm font-medium text-bleu-marine mb-2">Adresse email</label>
+						<input 
+							type="email" 
+							placeholder="ton@email.fr" 
+							class="input-field"
+							required
+						/>
+					</div>
+					
+					<div>
+						<label class="block text-sm font-medium text-bleu-marine mb-2">Mot de passe</label>
+						<input 
+							type="password" 
+							placeholder="••••••••" 
+							class="input-field"
+							required
+						/>
+					</div>
+					
+					<button type="submit" class="btn-primary w-full py-4 mt-3">
+						Créer mon compte
+					</button>
+				</form>
+				
+				<!-- Nudge -->
+				<div class="mt-6 bg-beige-lin p-4 rounded-lg text-center">
+					<p class="text-sm font-semibold text-bleu-marine mb-1">💡 Ta création t'attend !</p>
+					<p class="text-sm text-gris-taupe">Enregistre-la en 1 minute pour ne pas la perdre.</p>
+				</div>
+			</div>
+		</div>
+	</main>
+</Layout>
+
+<style>
+	.tab-btn {
+		@apply text-gris-taupe bg-blanc-casse;
+	}
+	
+	.tab-btn.active {
+		@apply text-bleu-marine bg-white font-semibold;
+	}
+</style>
+
+<script>
+	// Gestion des onglets
+	document.querySelectorAll('.tab-btn').forEach(btn => {
+		btn.addEventListener('click', () => {
+			const tab = btn.getAttribute('data-tab');
+			
+			// Update buttons
+			document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+			btn.classList.add('active');
+			
+			// Update content
+			document.querySelectorAll('.tab-content').forEach(content => {
+				content.classList.add('hidden');
+			});
+			document.getElementById(`${tab}-content`)?.classList.remove('hidden');
+		});
+	});
+	
+	// Gestion des formulaires
+	document.querySelectorAll('form').forEach(form => {
+		form.addEventListener('submit', (e) => {
+			e.preventDefault();
+			alert('Fonctionnalité d\'authentification à connecter avec PocketBase !');
+		});
+	});
+</script>
