@@ -31,7 +31,7 @@ jobs:
         host: ${{ secrets.HOST }}
         username: ${{ secrets.USER }}
         key: ${{ secrets.SSH_PRIVATE_KEY }}
-        port: 22<xxx>
+        port: 22040
         source: "dist/*"
         target: "/var/www/sae301/"
         strip_components: 1
