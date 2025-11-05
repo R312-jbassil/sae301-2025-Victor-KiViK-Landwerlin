@@ -1,90 +1,104 @@
 // src/pages/api/generateLunettesConfig.js
 import { OpenAI } from 'openai';
 
-const HF_TOKEN = process.env.HF_TOKEN;
+const HF_TOKEN = import.meta.env.HF_TOKEN;
+
 if (!HF_TOKEN) {
-    throw new Error("HF_TOKEN introuvable. Ajoutez-le à votre fichier .env (ex: .env.local) et redémarrez le serveur.");
+    console.error("❌ HF_TOKEN manquant dans .env");
 }
 
 export const POST = async ({ request }) => {
     try {
         const { prompt } = await request.json();
         
-        console.log('Prompt reçu:', prompt);
+        console.log('🤖 Prompt IA reçu:', prompt);
+
+        if (!HF_TOKEN) {
+            throw new Error("Token Hugging Face non configuré. Ajoutez HF_TOKEN dans votre fichier .env");
+        }
         
-        // Initialisation du client OpenAI avec Hugging Face
+        // Client OpenAI avec Hugging Face
         const client = new OpenAI({
             baseURL: "https://api-inference.huggingface.co/v1/",
             apiKey: HF_TOKEN,
         });
         
-        // Message système pour guider l'IA
+        // Prompt système optimisé
         const systemMessage = {
             role: "system",
-            content: `Tu es un assistant expert en configuration de lunettes. 
-Tu dois analyser la demande de l'utilisateur et retourner UNIQUEMENT un objet JSON valide avec cette structure exacte :
+            content: `Tu es un expert en design de lunettes. Analyse la demande et réponds UNIQUEMENT avec un JSON valide (sans markdown, sans backticks).
+
+Structure obligatoire :
 {
   "material": "acetate|metal|bois|bio",
   "color": "#HEXCODE",
-  "colorName": "nom de la couleur",
-  "pont": number (entre 14 et 22),
-  "verres": number (entre 48 et 56),
+  "colorName": "nom français",
+  "pont": 14-22,
+  "verres": 48-56,
   "lensType": "transparent|teinte|polarise"
 }
 
 Couleurs disponibles :
-- Bleu marine: #1C2A39
-- Brun clair: #BFA58A
-- Gris taupe: #6E6B65
-- Écaille: #8B4513
-- Vert sapin: #2C5F2D
-- Camel: #C19A6B
-- Noir: #000000
-- Beige: #F5F1E8
+- Bleu marine: #1C2A39 (classique, élégant)
+- Brun clair: #BFA58A (doux, raffiné)
+- Gris taupe: #6E6B65 (neutre, moderne)
+- Écaille: #8B4513 (vintage, caractère)
+- Vert sapin: #2C5F2D (naturel, audacieux)
+- Camel: #C19A6B (chaleureux, intemporel)
+- Noir: #000000 (sobre, universel)
+- Beige: #F5F1E8 (discret, minimaliste)
 
-Exemples de correspondances :
-- "moderne et élégant" → métal, couleurs sobres (noir, gris taupe)
-- "naturel et écologique" → bois ou bio, couleurs chaudes (camel, vert sapin)
-- "classique" → acétate, bleu marine ou écaille
-- "rétro/vintage" → acétate, écaille ou brun clair
-- "minimaliste" → métal, noir ou gris taupe
-- "protection solaire" → verres teintés ou polarisés
-- "léger" → métal, pont 14-16mm
-- "robuste" → acétate, pont 18-22mm
+Règles d'interprétation :
+- "moderne" ou "épuré" → metal + noir/gris
+- "classique" → acetate + bleu marine
+- "vintage" → acetate + écaille
+- "naturel" → bois/bio + vert/camel
+- "soleil" → verres teintés/polarisés
+- "léger" → metal + pont 14-16
+- "robuste" → acetate + pont 19-22
 
-Réponds UNIQUEMENT avec le JSON, sans texte additionnel.`
+Exemple :
+User: "Je veux des lunettes modernes et légères"
+Assistant: {"material":"metal","color":"#000000","colorName":"Noir","pont":15,"verres":50,"lensType":"transparent"}`
         };
         
-        // Appel à l'API Hugging Face
+        // Appel API
         const chatCompletion = await client.chat.completions.create({
             model: "meta-llama/Llama-3.3-70B-Instruct",
             messages: [
                 systemMessage,
                 { role: "user", content: prompt }
             ],
-            temperature: 0.7,
-            max_tokens: 500,
+            temperature: 0.5,
+            max_tokens: 300,
         });
         
-        const aiResponse = chatCompletion.choices[0].message.content;
-        console.log('Réponse brute de l\'IA:', aiResponse);
+        const aiResponse = chatCompletion.choices[0].message.content.trim();
+        console.log('🤖 Réponse IA brute:', aiResponse);
         
-        // Extraction du JSON de la réponse
+        // Extraction et parsing du JSON
         let configJSON;
         try {
-            // Essayer de parser directement
-            configJSON = JSON.parse(aiResponse);
-        } catch (e) {
-            // Si échec, essayer d'extraire le JSON avec regex
+            // Nettoyer la réponse (enlever markdown si présent)
+            let cleanedResponse = aiResponse
+                .replace(/```json/g, '')
+                .replace(/```/g, '')
+                .trim();
+            
+            configJSON = JSON.parse(cleanedResponse);
+        } catch (parseError) {
+            console.error('❌ Erreur parsing JSON:', parseError);
+            
+            // Tentative d'extraction avec regex
             const jsonMatch = aiResponse.match(/\{[\s\S]*\}/);
             if (jsonMatch) {
                 configJSON = JSON.parse(jsonMatch[0]);
             } else {
-                throw new Error("Impossible d'extraire la configuration JSON");
+                throw new Error("Format de réponse invalide de l'IA");
             }
         }
         
-        // Validation de la configuration
+        // Validation et valeurs par défaut
         const validMaterials = ['acetate', 'metal', 'bois', 'bio'];
         const validLensTypes = ['transparent', 'teinte', 'polarise'];
         
@@ -96,15 +110,10 @@ Réponds UNIQUEMENT avec le JSON, sans texte additionnel.`
             configJSON.lensType = 'transparent';
         }
         
-        if (configJSON.pont < 14 || configJSON.pont > 22) {
-            configJSON.pont = 18;
-        }
+        configJSON.pont = Math.max(14, Math.min(22, parseInt(configJSON.pont) || 18));
+        configJSON.verres = Math.max(48, Math.min(56, parseInt(configJSON.verres) || 52));
         
-        if (configJSON.verres < 48 || configJSON.verres > 56) {
-            configJSON.verres = 52;
-        }
-        
-        console.log('Configuration validée:', configJSON);
+        console.log('✅ Configuration validée:', configJSON);
         
         return new Response(
             JSON.stringify({ 
@@ -114,16 +123,27 @@ Réponds UNIQUEMENT avec le JSON, sans texte additionnel.`
             }), 
             {
                 headers: { "Content-Type": "application/json" },
+                status: 200
             }
         );
         
     } catch (error) {
-        console.error('Erreur lors de la génération:', error);
+        console.error('❌ Erreur génération IA:', error);
+        
+        let userMessage = error.message;
+        
+        if (error.message.includes('Token')) {
+            userMessage = "Token Hugging Face non configuré. Vérifiez votre fichier .env";
+        } else if (error.status === 503) {
+            userMessage = "Le modèle IA est en cours de chargement. Réessayez dans 30 secondes.";
+        } else if (error.status === 401) {
+            userMessage = "Token Hugging Face invalide";
+        }
         
         return new Response(
             JSON.stringify({ 
                 success: false, 
-                error: error.message,
+                error: userMessage,
                 details: error.toString()
             }), 
             {

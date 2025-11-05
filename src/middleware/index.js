@@ -2,36 +2,51 @@
 import pb from "../utils/pb";
 
 export const onRequest = async (context, next) => {
-    console.log('MIDDLEWARE', context.url.pathname);
+    console.log('MIDDLEWARE - URL:', context.url.pathname);
     
-    // Vérification de l'authentification
+    // Vérification de l'authentification via cookie
     const cookie = context.cookies.get("pb_auth")?.value;
+    
     if (cookie) {
-        pb.authStore.loadFromCookie(cookie);
-        if (pb.authStore.isValid) {
-            context.locals.user = pb.authStore.record;
+        try {
+            pb.authStore.loadFromCookie(cookie);
+            if (pb.authStore.isValid) {
+                context.locals.user = pb.authStore.model;
+                console.log('✅ Utilisateur authentifié:', pb.authStore.model?.id);
+            }
+        } catch (error) {
+            console.error('Erreur lecture cookie:', error);
         }
     }
 
-    // Pour les routes API, exige l'authentification sauf pour /api/login et /api/signup
+    // Routes API - authentification requise sauf login/signup
     if (context.url.pathname.startsWith('/api/')) {
-        if (!context.locals.user && 
-            context.url.pathname !== '/api/login' && 
-            context.url.pathname !== '/api/signup') {
-            return new Response(JSON.stringify({ error: "Unauthorized" }), { status: 401 });
+        const publicApiRoutes = ['/api/login', '/api/signup'];
+        
+        if (!publicApiRoutes.includes(context.url.pathname) && !context.locals.user) {
+            return new Response(
+                JSON.stringify({ error: "Non authentifié" }), 
+                { 
+                    status: 401,
+                    headers: { "Content-Type": "application/json" }
+                }
+            );
         }
         return next();
     }
 
-    // Pour les pages publiques (pas besoin d'auth)
-    const publicPages = ['/', '/atelier', '/contact'];
+    // Pages publiques (pas d'auth requise)
+    const publicPages = ['/', '/atelier', '/contact', '/compte'];
     if (publicPages.includes(context.url.pathname)) {
         return next();
     }
 
-    // Pour les pages protégées, rediriger vers /compte si non authentifié
-    if (!context.locals.user && 
-        context.url.pathname !== '/compte') {
+    // Pages protégées - redirection si non connecté
+    const protectedPages = ['/configurateur', '/modeles', '/produit'];
+    const isProtected = protectedPages.some(page => context.url.pathname.startsWith(page));
+    
+    if (isProtected && !context.locals.user) {
+        console.log('❌ Accès refusé - Redirection vers /compte');
         return Response.redirect(new URL('/compte', context.url), 303);
     }
 
