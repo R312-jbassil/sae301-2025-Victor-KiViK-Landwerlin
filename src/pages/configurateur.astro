@@ -8,7 +8,7 @@ import Header from '../components/Header.astro';
 	
 	<main class="p-20 bg-gradient-to-br from-blanc-casse to-beige-lin min-h-[calc(100vh-100px)]">
 		<div class="grid grid-cols-2 gap-20">
-			<!-- COLONNE GAUCHE : Visualisation 3D/SVG -->
+			<!-- COLONNE GAUCHE : Visualisation SVG -->
 			<div class="flex flex-col gap-8">
 				<div class="card p-16 flex items-center justify-center min-h-[500px]">
 					<div id="svg-container" class="w-full max-w-[600px]">
@@ -88,14 +88,14 @@ import Header from '../components/Header.astro';
 					<div class="config-section hidden" data-section="2">
 						<h3 class="text-lg font-medium text-bleu-marine mb-4">Couleur de la monture</h3>
 						<div class="flex gap-3 flex-wrap">
-							<button class="color-btn active" data-color="#1C2A39" style="background: #1C2A39" title="Bleu marine"></button>
-							<button class="color-btn" data-color="#BFA58A" style="background: #BFA58A" title="Brun clair"></button>
-							<button class="color-btn" data-color="#6E6B65" style="background: #6E6B65" title="Gris taupe"></button>
-							<button class="color-btn" data-color="#8B4513" style="background: #8B4513" title="Écaille"></button>
-							<button class="color-btn" data-color="#2C5F2D" style="background: #2C5F2D" title="Vert sapin"></button>
-							<button class="color-btn" data-color="#C19A6B" style="background: #C19A6B" title="Camel"></button>
-							<button class="color-btn" data-color="#000000" style="background: #000000" title="Noir"></button>
-							<button class="color-btn" data-color="#F5F1E8" style="background: #F5F1E8; border: 2px solid #BFA58A" title="Beige"></button>
+							<button class="color-btn active" data-color="#1C2A39" data-name="Bleu marine" style="background: #1C2A39" title="Bleu marine"></button>
+							<button class="color-btn" data-color="#BFA58A" data-name="Brun clair" style="background: #BFA58A" title="Brun clair"></button>
+							<button class="color-btn" data-color="#6E6B65" data-name="Gris taupe" style="background: #6E6B65" title="Gris taupe"></button>
+							<button class="color-btn" data-color="#8B4513" data-name="Écaille" style="background: #8B4513" title="Écaille"></button>
+							<button class="color-btn" data-color="#2C5F2D" data-name="Vert sapin" style="background: #2C5F2D" title="Vert sapin"></button>
+							<button class="color-btn" data-color="#C19A6B" data-name="Camel" style="background: #C19A6B" title="Camel"></button>
+							<button class="color-btn" data-color="#000000" data-name="Noir" style="background: #000000" title="Noir"></button>
+							<button class="color-btn" data-color="#F5F1E8" data-name="Beige" style="background: #F5F1E8; border: 2px solid #BFA58A" title="Beige"></button>
 						</div>
 					</div>
 					
@@ -128,15 +128,15 @@ import Header from '../components/Header.astro';
 					<div class="config-section hidden" data-section="4">
 						<h3 class="text-lg font-medium text-bleu-marine mb-4">Type de verres</h3>
 						<div class="space-y-4">
-							<button class="lens-btn active" data-lens="transparent">
+							<button class="lens-btn active" data-lens="transparent" data-opacity="0.1">
 								<span class="font-medium">Transparents</span>
 								<span class="text-sm text-gris-taupe">Vision standard</span>
 							</button>
-							<button class="lens-btn" data-lens="teinte">
+							<button class="lens-btn" data-lens="teinte" data-opacity="0.4">
 								<span class="font-medium">Teintés</span>
 								<span class="text-sm text-gris-taupe">Protection solaire</span>
 							</button>
-							<button class="lens-btn" data-lens="polarise">
+							<button class="lens-btn" data-lens="polarise" data-opacity="0.6">
 								<span class="font-medium">Polarisés</span>
 								<span class="text-sm text-gris-taupe">Anti-reflets</span>
 							</button>
@@ -172,6 +172,9 @@ import Header from '../components/Header.astro';
 								<span class="font-semibold text-brun-clair">189 €</span>
 							</div>
 						</div>
+						<button id="save-config-btn" class="w-full btn-primary py-4 mb-3">
+							💾 Enregistrer ma création
+						</button>
 					</div>
 					
 					<!-- Navigation buttons -->
@@ -195,13 +198,15 @@ import Header from '../components/Header.astro';
 					</h3>
 					<p class="text-sm text-gris-taupe mb-4">Décrivez vos lunettes idéales en langage naturel</p>
 					<textarea 
+						id="ai-prompt"
 						class="w-full p-3 border border-brun-clair rounded-lg resize-none focus:border-bleu-marine focus:ring-2 focus:ring-bleu-marine focus:ring-opacity-20" 
 						rows="3" 
 						placeholder="Ex: Je veux une monture ronde en métal doré avec des verres teintés bleus..."
 					></textarea>
-					<button class="w-full mt-3 btn-secondary py-2">
+					<button id="ai-generate-btn" class="w-full mt-3 btn-secondary py-2">
 						Générer avec l'IA
 					</button>
+					<div id="ai-status" class="mt-2 text-sm text-center"></div>
 				</div>
 			</div>
 		</div>
@@ -213,7 +218,7 @@ import Header from '../components/Header.astro';
 				<div>
 					<h4 class="font-semibold text-bleu-marine mb-1">Ta création t'attend !</h4>
 					<p class="text-sm text-gris-taupe mb-3">Enregistre-la en 1 minute pour ne pas la perdre.</p>
-					<button class="btn-primary py-2 px-4 text-sm w-full">
+					<button class="btn-primary py-2 px-4 text-sm w-full" onclick="document.getElementById('save-config-btn').click()">
 						Enregistrer ma création
 					</button>
 				</div>
@@ -298,19 +303,75 @@ import Header from '../components/Header.astro';
 </style>
 
 <script>
-	// Import du SVG
+	// Configuration actuelle
+	const config = {
+		material: 'acetate',
+		color: '#1C2A39',
+		colorName: 'Bleu marine',
+		pont: 18,
+		verres: 52,
+		lensType: 'transparent',
+		lensOpacity: 0.1
+	};
+
+	// Import et modification du SVG
 	fetch('/src/assets/lunettes-base.svg')
 		.then(r => r.text())
 		.then(svg => {
 			document.getElementById('svg-container').innerHTML = svg;
+			applySVGConfig();
 		});
+	
+	function applySVGConfig() {
+		const svgEl = document.querySelector('#svg-container svg');
+		if (!svgEl) return;
+		
+		// Appliquer la couleur à la monture (classe .cls-4)
+		svgEl.querySelectorAll('.cls-4').forEach(path => {
+			path.style.stroke = config.color;
+			path.style.fill = 'none';
+		});
+		
+		// Appliquer la couleur aux branches (groupe #branches)
+		const branches = svgEl.querySelector('#branches');
+		if (branches) {
+			branches.querySelectorAll('path').forEach(path => {
+				if (path.classList.contains('cls-4')) {
+					path.style.stroke = config.color;
+				} else if (path.classList.contains('cls-1')) {
+					// Ombres plus subtiles avec la couleur choisie
+					path.style.fill = config.color;
+					path.style.opacity = '0.2';
+				}
+			});
+		}
+		
+		// Appliquer la couleur à la monture principale
+		const monture = svgEl.querySelector('#monture');
+		if (monture) {
+			monture.querySelectorAll('path').forEach(path => {
+				if (path.classList.contains('cls-4')) {
+					path.style.stroke = config.color;
+					path.style.strokeWidth = '1.5px';
+				}
+			});
+		}
+		
+		// Appliquer l'opacité aux verres
+		const verres = svgEl.querySelector('#verres');
+		if (verres) {
+			verres.querySelectorAll('path').forEach(path => {
+				path.style.fill = config.color;
+				path.style.opacity = config.lensOpacity;
+			});
+		}
+	}
 	
 	// Gestion du stepper
 	let currentStep = 1;
 	const totalSteps = 5;
 	
 	function updateStep(step) {
-		// Update stepper visual
 		document.querySelectorAll('.step').forEach((el, index) => {
 			if (index + 1 <= step) {
 				el.classList.add('active');
@@ -319,24 +380,19 @@ import Header from '../components/Header.astro';
 			}
 		});
 		
-		// Update sections
 		document.querySelectorAll('.config-section').forEach(section => {
 			section.classList.add('hidden');
 		});
 		document.querySelector(`[data-section="${step}"]`)?.classList.remove('hidden');
 		
-		// Update buttons
 		document.getElementById('prev-btn').disabled = step === 1;
-		document.getElementById('next-btn').textContent = step === totalSteps ? 'Enregistrer' : 'Suivant';
+		document.getElementById('next-btn').textContent = step === totalSteps ? 'Terminer' : 'Suivant';
 	}
 	
 	document.getElementById('next-btn')?.addEventListener('click', () => {
 		if (currentStep < totalSteps) {
 			currentStep++;
 			updateStep(currentStep);
-		} else {
-			// Save logic
-			alert('Sauvegarde de la configuration !');
 		}
 	});
 	
@@ -352,6 +408,7 @@ import Header from '../components/Header.astro';
 		btn.addEventListener('click', () => {
 			document.querySelectorAll('.material-btn').forEach(b => b.classList.remove('active'));
 			btn.classList.add('active');
+			config.material = btn.getAttribute('data-material');
 			document.getElementById('recap-material').textContent = btn.querySelector('.font-medium').textContent;
 		});
 	});
@@ -361,26 +418,22 @@ import Header from '../components/Header.astro';
 		btn.addEventListener('click', () => {
 			document.querySelectorAll('.color-btn').forEach(b => b.classList.remove('active'));
 			btn.classList.add('active');
-			const color = btn.getAttribute('data-color');
-			document.getElementById('recap-color').textContent = btn.getAttribute('title');
-			
-			// Update SVG color
-			const svg = document.querySelector('#svg-container svg');
-			if (svg) {
-				svg.querySelectorAll('.cls-4').forEach(path => {
-					path.style.stroke = color;
-				});
-			}
+			config.color = btn.getAttribute('data-color');
+			config.colorName = btn.getAttribute('data-name');
+			document.getElementById('recap-color').textContent = config.colorName;
+			applySVGConfig();
 		});
 	});
 	
 	// Gestion des ranges
 	document.getElementById('pont-width')?.addEventListener('input', (e) => {
+		config.pont = e.target.value;
 		document.getElementById('pont-value').textContent = e.target.value;
 		document.getElementById('recap-pont').textContent = e.target.value + ' mm';
 	});
 	
 	document.getElementById('verre-size')?.addEventListener('input', (e) => {
+		config.verres = e.target.value;
 		document.getElementById('verre-value').textContent = e.target.value;
 		document.getElementById('recap-verre').textContent = e.target.value + ' mm';
 	});
@@ -390,7 +443,178 @@ import Header from '../components/Header.astro';
 		btn.addEventListener('click', () => {
 			document.querySelectorAll('.lens-btn').forEach(b => b.classList.remove('active'));
 			btn.classList.add('active');
+			config.lensType = btn.getAttribute('data-lens');
+			config.lensOpacity = parseFloat(btn.getAttribute('data-opacity'));
 			document.getElementById('recap-lens').textContent = btn.querySelector('.font-medium').textContent;
+			applySVGConfig();
 		});
 	});
+	
+	// Sauvegarde de la configuration
+	document.getElementById('save-config-btn')?.addEventListener('click', async () => {
+		const name = prompt("Donnez un nom à votre création :");
+		if (!name) return;
+		
+		const svgCode = document.querySelector('#svg-container').innerHTML;
+		
+		try {
+			const response = await fetch('/api/saveLunettes', {
+				method: 'POST',
+				headers: { 'Content-Type': 'application/json' },
+				body: JSON.stringify({
+					name,
+					svg_data: svgCode,
+					materiau: config.material,
+					couleur: config.colorName,
+					pont: config.pont,
+					verres: config.verres,
+					type_verre: config.lensType,
+					prix: 189
+				})
+			});
+			
+			const data = await response.json();
+			if (data.success) {
+				alert('✅ Création sauvegardée avec succès !');
+				window.location.href = '/modeles';
+			} else {
+				alert('❌ Erreur lors de la sauvegarde');
+			}
+		} catch (error) {
+			console.error('Erreur:', error);
+			alert('❌ Erreur lors de la sauvegarde');
+		}
+	});
+	
+	// Génération IA
+	document.getElementById('ai-generate-btn')?.addEventListener('click', async () => {
+		const prompt = document.getElementById('ai-prompt').value;
+		if (!prompt.trim()) {
+			alert('Veuillez entrer une description');
+			return;
+		}
+		
+		const statusEl = document.getElementById('ai-status');
+		const btn = document.getElementById('ai-generate-btn');
+		
+		statusEl.textContent = '⏳ Génération en cours...';
+		statusEl.className = 'mt-2 text-sm text-center text-bleu-marine';
+		btn.disabled = true;
+		
+		try {
+			const response = await fetch('/api/generateLunettesConfig', {
+				method: 'POST',
+				headers: { 'Content-Type': 'application/json' },
+				body: JSON.stringify({ prompt })
+			});
+			
+			const data = await response.json();
+			
+			if (data.success && data.config) {
+				// Appliquer la configuration générée
+				const aiConfig = data.config;
+				
+				// Matériau
+				if (aiConfig.material) {
+					const materialBtn = document.querySelector(`[data-material="${aiConfig.material}"]`);
+					if (materialBtn) materialBtn.click();
+				}
+				
+				// Couleur
+				if (aiConfig.color) {
+					const colorBtn = document.querySelector(`[data-color="${aiConfig.color}"]`);
+					if (colorBtn) colorBtn.click();
+				}
+				
+				// Dimensions
+				if (aiConfig.pont) {
+					document.getElementById('pont-width').value = aiConfig.pont;
+					document.getElementById('pont-width').dispatchEvent(new Event('input'));
+				}
+				
+				if (aiConfig.verres) {
+					document.getElementById('verre-size').value = aiConfig.verres;
+					document.getElementById('verre-size').dispatchEvent(new Event('input'));
+				}
+				
+				// Type de verre
+				if (aiConfig.lensType) {
+					const lensBtn = document.querySelector(`[data-lens="${aiConfig.lensType}"]`);
+					if (lensBtn) lensBtn.click();
+				}
+				
+				statusEl.textContent = '✅ Configuration appliquée !';
+				statusEl.className = 'mt-2 text-sm text-center text-green-600';
+				
+				// Passer à l'étape suivante après un court délai
+				setTimeout(() => {
+					currentStep = 2;
+					updateStep(currentStep);
+				}, 1000);
+			} else {
+				throw new Error(data.error || 'Erreur inconnue');
+			}
+		} catch (error) {
+			console.error('Erreur IA:', error);
+			statusEl.textContent = '❌ Erreur: ' + error.message;
+			statusEl.className = 'mt-2 text-sm text-center text-red-600';
+		} finally {
+			btn.disabled = false;
+		}
+	});
+	
+	document.querySelector('#nudge-save button')?.addEventListener('click', async () => {
+        // Vérifie si l'utilisateur est connecté
+        const user = JSON.parse(localStorage.getItem('user') || '{}');
+        
+        if (!user || !user.id) {
+            // Redirige vers la page de connexion
+            window.location.href = '/compte';
+            return;
+        }
+
+        const nom = prompt('Donnez un nom à votre création :');
+        if (!nom) return;
+        
+        // Récupère toutes les données de configuration
+        const materiau = document.querySelector('.material-btn.active')?.getAttribute('data-material') || 'acetate';
+        const couleur = document.querySelector('.color-btn.active')?.getAttribute('data-color') || '#1C2A39';
+        const pont = document.getElementById('pont-width')?.value || 18;
+        const verres = document.getElementById('verre-size')?.value || 52;
+        const typeVerre = document.querySelector('.lens-btn.active')?.getAttribute('data-lens') || 'transparent';
+        
+        // Récupère le SVG
+        const svgElement = document.querySelector('#svg-container svg');
+        const svgData = svgElement ? svgElement.outerHTML : '';
+        
+        try {
+            const response = await fetch('/api/saveLunettes', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({
+                    user: user.id,
+                    nom,
+                    materiau,
+                    couleur,
+                    pont: parseFloat(pont),
+                    verres: parseFloat(verres),
+                    type_verre: typeVerre,
+                    svg_data: svgData,
+                    prix: 189
+                })
+            });
+            
+            const result = await response.json();
+            
+            if (result.success) {
+                alert('✅ Création sauvegardée avec succès !');
+                window.location.href = '/modeles';
+            } else {
+                alert('❌ Erreur : ' + result.error);
+            }
+        } catch (error) {
+            console.error('Erreur:', error);
+            alert('❌ Erreur lors de la sauvegarde');
+        }
+    });
 </script>

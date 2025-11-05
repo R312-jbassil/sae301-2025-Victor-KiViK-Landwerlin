@@ -1,16 +1,24 @@
 ---
 import Layout from '../layouts/Layout.astro';
 import Header from '../components/Header.astro';
+import pb from '../utils/pb';
 
-// Données mockées (à remplacer par PocketBase)
-const creations = [
-	{ id: 1, name: 'Modèle Minimaliste', material: 'Acétate', color: '#1C2A39', price: 189 },
-	{ id: 2, name: 'Style Parisien', material: 'Métal', color: '#BFA58A', price: 199 },
-	{ id: 3, name: 'Design Nature', material: 'Bio-acétate', color: '#2C5F2D', price: 209 },
-];
+const user = Astro.locals.user;
+
+let creations = [];
+if (user && user.id) {
+    try {
+        creations = await pb.collection('lunettes').getFullList({
+            sort: '-created',
+            filter: `user = "${user.id}"`
+        });
+    } catch (error) {
+        console.error('Erreur:', error);
+    }
+}
 ---
 
-<Layout title="Mes créations - TaVue" description="Retrouvez toutes vos créations de lunettes personnalisées.">
+<Layout>
 	<Header currentPage="modeles" />
 	
 	<main class="p-20 bg-blanc-casse min-h-[calc(100vh-100px)]">
@@ -24,40 +32,36 @@ const creations = [
 			</a>
 		</div>
 		
-		<!-- Grille des créations -->
-		<div class="grid grid-cols-3 gap-8">
-			{creations.map(creation => (
-				<a href={`/produit?id=${creation.id}`} class="card p-6 hover:-translate-y-2 hover:shadow-2xl transition-all duration-300 group">
-					<!-- Image/SVG -->
-					<div class="bg-blanc-casse p-8 rounded-xl mb-4 h-[250px] flex items-center justify-center">
-						<div 
-							class="w-[250px] h-[100px] rounded-full opacity-20 group-hover:opacity-30 transition-opacity" 
-							style={`background: ${creation.color}`}
-						></div>
-					</div>
-					
-					<!-- Info -->
-					<h3 class="text-xl font-semibold text-bleu-marine mb-2">{creation.name}</h3>
-					<p class="text-sm text-gris-taupe mb-4">{creation.material}</p>
-					
-					<div class="flex justify-between items-center pt-4 border-t border-beige-lin">
-						<span class="text-lg font-semibold text-brun-clair">{creation.price} €</span>
-						<button class="text-bleu-marine hover:text-brun-clair transition-colors">
-							Voir →
-						</button>
-					</div>
+		{creations.length > 0 ? (
+			<div class="grid grid-cols-3 gap-8">
+				{creations.map(creation => (
+					<a href={`/produit?id=${creation.id}`} class="card p-6 hover:-translate-y-2 hover:shadow-2xl transition-all duration-300 group">
+						<div class="bg-blanc-casse p-8 rounded-xl mb-4 h-[250px] flex items-center justify-center"
+							set:html={creation.svg_data}
+						>
+						</div>
+						
+						<h3 class="text-xl font-semibold text-bleu-marine mb-2">{creation.nom}</h3>
+						<p class="text-sm text-gris-taupe mb-4">{creation.materiau}</p>
+						
+						<div class="flex justify-between items-center pt-4 border-t border-beige-lin">
+							<span class="text-lg font-semibold text-brun-clair">{creation.prix} €</span>
+							<button class="text-bleu-marine hover:text-brun-clair transition-colors">
+								Voir →
+							</button>
+						</div>
+					</a>
+				))}
+			</div>
+		) : (
+			<div class="text-center py-20">
+				<div class="text-6xl mb-4">👓</div>
+				<h2 class="text-2xl font-semibold text-bleu-marine mb-3">Aucune création pour le moment</h2>
+				<p class="text-gris-taupe mb-8">Commence par créer ta première paire de lunettes personnalisée</p>
+				<a href="/configurateur" class="btn-primary inline-block">
+					Créer mes lunettes
 				</a>
-			))}
-		</div>
-		
-		<!-- Empty state si pas de créations -->
-		<!-- <div class="text-center py-20">
-			<div class="text-6xl mb-4">👓</div>
-			<h2 class="text-2xl font-semibold text-bleu-marine mb-3">Aucune création pour le moment</h2>
-			<p class="text-gris-taupe mb-8">Commence par créer ta première paire de lunettes personnalisée</p>
-			<a href="/configurateur" class="btn-primary inline-block">
-				Créer mes lunettes
-			</a>
-		</div> -->
+			</div>
+		)}
 	</main>
 </Layout>

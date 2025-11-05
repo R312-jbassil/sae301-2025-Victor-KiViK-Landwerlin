@@ -1,12 +1,17 @@
 ---
 import Layout from '../layouts/Layout.astro';
 import Header from '../components/Header.astro';
+
+// Si déjà connecté, rediriger
+if (Astro.locals.user) {
+	return Astro.redirect('/modeles');
+}
 ---
 
-<Layout title="Mon compte - TaVue" description="Connectez-vous pour accéder à vos créations et gérer votre compte.">
+<Layout title="Mon compte - TaVue" description="Connecte-toi pour accéder à tes créations.">
 	<Header currentPage="compte" />
 	
-	<main class="min-h-[calc(100vh-100px)] bg-gradient-to-br from-blanc-casse to-beige-lin flex items-center justify-center p-16">
+	<main class="min-h-[calc(100vh-100px)] bg-gradient-to-br from-blanc-casse to-beige-lin flex items-center justify-center p-8">
 		<div class="card w-full max-w-[500px] overflow-hidden">
 			<!-- Onglets -->
 			<div class="flex border-b border-beige-lin">
@@ -29,11 +34,12 @@ import Header from '../components/Header.astro';
 				<h2 class="text-3xl font-semibold text-bleu-marine mb-3">Bienvenue.</h2>
 				<p class="text-gris-taupe mb-8">Connecte-toi pour retrouver tes créations</p>
 				
-				<form class="space-y-6">
+				<form id="login-form" class="space-y-6">
 					<div>
 						<label class="block text-sm font-medium text-bleu-marine mb-2">Adresse email</label>
 						<input 
 							type="email" 
+							name="email"
 							placeholder="ton@email.fr" 
 							class="input-field"
 							required
@@ -44,6 +50,7 @@ import Header from '../components/Header.astro';
 						<label class="block text-sm font-medium text-bleu-marine mb-2">Mot de passe</label>
 						<input 
 							type="password" 
+							name="password"
 							placeholder="••••••••" 
 							class="input-field"
 							required
@@ -54,6 +61,8 @@ import Header from '../components/Header.astro';
 						Se connecter
 					</button>
 				</form>
+				
+				<p id="login-status" class="mt-4 text-center text-sm"></p>
 				
 				<!-- Nudge -->
 				<div class="mt-6 bg-beige-lin p-4 rounded-lg text-center">
@@ -67,11 +76,12 @@ import Header from '../components/Header.astro';
 				<h2 class="text-3xl font-semibold text-bleu-marine mb-3">Rejoins-nous.</h2>
 				<p class="text-gris-taupe mb-8">Crée ton compte en 1 minute</p>
 				
-				<form class="space-y-6">
+				<form id="signup-form" class="space-y-6">
 					<div>
 						<label class="block text-sm font-medium text-bleu-marine mb-2">Nom complet</label>
 						<input 
 							type="text" 
+							name="name"
 							placeholder="Jean Dupont" 
 							class="input-field"
 							required
@@ -82,6 +92,7 @@ import Header from '../components/Header.astro';
 						<label class="block text-sm font-medium text-bleu-marine mb-2">Adresse email</label>
 						<input 
 							type="email" 
+							name="email"
 							placeholder="ton@email.fr" 
 							class="input-field"
 							required
@@ -92,8 +103,22 @@ import Header from '../components/Header.astro';
 						<label class="block text-sm font-medium text-bleu-marine mb-2">Mot de passe</label>
 						<input 
 							type="password" 
+							name="password"
 							placeholder="••••••••" 
 							class="input-field"
+							minlength="8"
+							required
+						/>
+					</div>
+					
+					<div>
+						<label class="block text-sm font-medium text-bleu-marine mb-2">Confirmer le mot de passe</label>
+						<input 
+							type="password" 
+							name="passwordConfirm"
+							placeholder="••••••••" 
+							class="input-field"
+							minlength="8"
 							required
 						/>
 					</div>
@@ -102,6 +127,8 @@ import Header from '../components/Header.astro';
 						Créer mon compte
 					</button>
 				</form>
+				
+				<p id="signup-status" class="mt-4 text-center text-sm"></p>
 				
 				<!-- Nudge -->
 				<div class="mt-6 bg-beige-lin p-4 rounded-lg text-center">
@@ -129,11 +156,9 @@ import Header from '../components/Header.astro';
 		btn.addEventListener('click', () => {
 			const tab = btn.getAttribute('data-tab');
 			
-			// Update buttons
 			document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
 			btn.classList.add('active');
 			
-			// Update content
 			document.querySelectorAll('.tab-content').forEach(content => {
 				content.classList.add('hidden');
 			});
@@ -141,11 +166,106 @@ import Header from '../components/Header.astro';
 		});
 	});
 	
-	// Gestion des formulaires
-	document.querySelectorAll('form').forEach(form => {
-		form.addEventListener('submit', (e) => {
-			e.preventDefault();
-			alert('Fonctionnalité d\'authentification à connecter avec PocketBase !');
-		});
+	// Connexion
+	const loginForm = document.getElementById('login-form');
+	const loginStatus = document.getElementById('login-status');
+
+	loginForm?.addEventListener('submit', async (e) => {
+		e.preventDefault();
+		loginStatus.textContent = 'Connexion...';
+		loginStatus.className = 'mt-4 text-center text-sm text-bleu-marine';
+		
+		const formData = new FormData(loginForm);
+
+		try {
+			const res = await fetch('/api/login', {
+				method: 'POST',
+				headers: { 'Content-Type': 'application/json' },
+				body: JSON.stringify({
+					email: formData.get('email'),
+					password: formData.get('password')
+				}),
+				credentials: 'include'
+			});
+
+			if (res.ok) {
+				const data = await res.json();
+				localStorage.setItem('user', JSON.stringify(data.user));
+				loginStatus.textContent = '✅ Connexion réussie !';
+				loginStatus.className = 'mt-4 text-center text-sm text-green-600';
+				setTimeout(() => window.location.href = '/modeles', 500);
+			} else {
+				loginStatus.textContent = '❌ Email ou mot de passe invalide';
+				loginStatus.className = 'mt-4 text-center text-sm text-red-600';
+			}
+		} catch (error) {
+			console.error('Erreur:', error);
+			loginStatus.textContent = '❌ Erreur de connexion';
+			loginStatus.className = 'mt-4 text-center text-sm text-red-600';
+		}
+	});
+
+	// Inscription
+	const signupForm = document.getElementById('signup-form');
+	const signupStatus = document.getElementById('signup-status');
+
+	signupForm?.addEventListener('submit', async (e) => {
+		e.preventDefault();
+		signupStatus.textContent = 'Création du compte...';
+		signupStatus.className = 'mt-4 text-center text-sm text-bleu-marine';
+		
+		const formData = new FormData(signupForm);
+		const password = formData.get('password');
+		const passwordConfirm = formData.get('passwordConfirm');
+
+		if (password !== passwordConfirm) {
+			signupStatus.textContent = '❌ Les mots de passe ne correspondent pas';
+			signupStatus.className = 'mt-4 text-center text-sm text-red-600';
+			return;
+		}
+
+		try {
+			const res = await fetch('/api/signup', {
+				method: 'POST',
+				headers: { 'Content-Type': 'application/json' },
+				body: JSON.stringify({
+					name: formData.get('name'),
+					email: formData.get('email'),
+					password: formData.get('password'),
+					passwordConfirm: formData.get('passwordConfirm')
+				})
+			});
+
+			const data = await res.json();
+
+			if (res.ok) {
+				signupStatus.textContent = '✅ Compte créé ! Connexion...';
+				signupStatus.className = 'mt-4 text-center text-sm text-green-600';
+				
+				// Auto-login
+				const loginRes = await fetch('/api/login', {
+					method: 'POST',
+					headers: { 'Content-Type': 'application/json' },
+					body: JSON.stringify({
+						email: formData.get('email'),
+						password: formData.get('password')
+					}),
+					credentials: 'include'
+				});
+
+				if (loginRes.ok) {
+					const loginData = await loginRes.json();
+					localStorage.setItem('user', JSON.stringify(loginData.user));
+					setTimeout(() => window.location.href = '/configurateur', 500);
+				}
+			} else {
+				signupStatus.textContent = '❌ ' + (data.error || 'Erreur lors de la création');
+				signupStatus.className = 'mt-4 text-center text-sm text-red-600';
+			}
+		} catch (error) {
+			console.error('Erreur:', error);
+			signupStatus.textContent = '❌ Erreur de connexion au serveur';
+			signupStatus.className = 'mt-4 text-center text-sm text-red-600';
+		}
 	});
 </script>
