@@ -6,62 +6,261 @@ import pb from '../utils/pb';
 const user = Astro.locals.user;
 
 let creations = [];
+let error = null;
+
 if (user && user.id) {
     try {
+        // Récupérer toutes les créations de l'utilisateur
         creations = await pb.collection('lunettes').getFullList({
             sort: '-created',
             filter: `user = "${user.id}"`
         });
-    } catch (error) {
-        console.error('Erreur:', error);
+        console.log(`✅ ${creations.length} créations chargées pour ${user.email}`);
+    } catch (err) {
+        console.error('❌ Erreur chargement créations:', err);
+        error = "Impossible de charger vos créations. Veuillez réessayer.";
     }
 }
 ---
 
-<Layout>
+<Layout title="Mes créations - TaVue" description="Retrouvez toutes vos lunettes personnalisées">
 	<Header currentPage="modeles" />
 	
 	<main class="p-20 bg-blanc-casse min-h-[calc(100vh-100px)]">
+		<!-- En-tête avec stats -->
 		<div class="flex justify-between items-center mb-12">
 			<div>
 				<h1 class="text-4xl font-semibold text-bleu-marine mb-2">Mes créations</h1>
-				<p class="text-gris-taupe">Retrouve toutes tes paires de lunettes personnalisées</p>
+				<p class="text-gris-taupe">
+					{creations.length > 0 
+						? `${creations.length} paire${creations.length > 1 ? 's' : ''} personnalisée${creations.length > 1 ? 's' : ''}`
+						: 'Aucune création pour le moment'
+					}
+				</p>
 			</div>
-			<a href="/configurateur" class="btn-primary">
+			<a href="/configurateur" class="btn-primary flex items-center gap-2">
+				<svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+					<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"/>
+				</svg>
 				Nouvelle création
 			</a>
 		</div>
 		
+		<!-- Message d'erreur si échec chargement -->
+		{error && (
+			<div class="bg-red-50 border-2 border-red-200 rounded-xl p-6 mb-8">
+				<div class="flex items-center gap-3">
+					<svg class="w-6 h-6 text-red-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+						<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/>
+					</svg>
+					<div>
+						<h3 class="font-semibold text-red-700">Erreur de chargement</h3>
+						<p class="text-red-600 text-sm">{error}</p>
+					</div>
+				</div>
+			</div>
+		)}
+		
+		<!-- Grille des créations -->
 		{creations.length > 0 ? (
-			<div class="grid grid-cols-3 gap-8">
+			<div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
 				{creations.map(creation => (
-					<a href={`/produit?id=${creation.id}`} class="card p-6 hover:-translate-y-2 hover:shadow-2xl transition-all duration-300 group">
-						<div class="bg-blanc-casse p-8 rounded-xl mb-4 h-[250px] flex items-center justify-center"
-							set:html={creation.svg_data}
-						>
+					<div class="card group relative overflow-hidden">
+						<!-- Badge date de création -->
+						<div class="absolute top-4 right-4 z-10 bg-beige-lin px-3 py-1 rounded-full text-xs text-gris-taupe">
+							{new Date(creation.created).toLocaleDateString('fr-FR', { day: 'numeric', month: 'short' })}
 						</div>
 						
-						<h3 class="text-xl font-semibold text-bleu-marine mb-2">{creation.nom}</h3>
-						<p class="text-sm text-gris-taupe mb-4">{creation.materiau}</p>
+						<!-- Visuel lunettes -->
+						<a href={`/produit?id=${creation.id}`} class="block p-8 bg-gradient-to-br from-blanc-casse to-beige-lin rounded-t-2xl">
+							<div class="h-[200px] flex items-center justify-center transform group-hover:scale-105 transition-transform duration-300"
+								set:html={creation.svg_data}
+							>
+							</div>
+						</a>
 						
-						<div class="flex justify-between items-center pt-4 border-t border-beige-lin">
-							<span class="text-lg font-semibold text-brun-clair">{creation.prix} €</span>
-							<button class="text-bleu-marine hover:text-brun-clair transition-colors">
-								Voir →
-							</button>
+						<!-- Infos -->
+						<div class="p-6">
+							<a href={`/produit?id=${creation.id}`} class="block mb-4">
+								<h3 class="text-xl font-semibold text-bleu-marine mb-2 group-hover:text-brun-clair transition-colors">
+									{creation.nom}
+								</h3>
+								<div class="flex items-center gap-2 text-sm text-gris-taupe mb-2">
+									<span class="capitalize">{creation.materiau}</span>
+									<span>•</span>
+									<span>{creation.couleur}</span>
+								</div>
+								<div class="flex items-center gap-3 text-xs text-gris-taupe">
+									<span>Pont: {creation.pont}mm</span>
+									<span>•</span>
+									<span>Verres: {creation.verres}mm</span>
+								</div>
+							</a>
+							
+							<!-- Actions -->
+							<div class="flex gap-3 pt-4 border-t border-beige-lin">
+								<a 
+									href={`/produit?id=${creation.id}`}
+									class="flex-1 py-3 bg-bleu-marine text-white rounded-lg hover:bg-opacity-90 transition-all text-center font-medium"
+								>
+									Voir
+								</a>
+								<button 
+									class="duplicate-btn px-4 py-3 border-2 border-bleu-marine text-bleu-marine rounded-lg hover:bg-bleu-marine hover:text-white transition-all"
+									data-id={creation.id}
+									data-name={creation.nom}
+									title="Dupliquer"
+								>
+									<svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+										<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 16H6a2 2 0 01-2-2V6a2 2 0 012-2h8a2 2 0 012 2v2m-6 12h8a2 2 0 002-2v-8a2 2 0 00-2-2h-8a2 2 0 00-2 2v8a2 2 0 002 2z"/>
+									</svg>
+								</button>
+								<button 
+									class="delete-btn px-4 py-3 border-2 border-red-500 text-red-500 rounded-lg hover:bg-red-500 hover:text-white transition-all"
+									data-id={creation.id}
+									data-name={creation.nom}
+									title="Supprimer"
+								>
+									<svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+										<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"/>
+									</svg>
+								</button>
+							</div>
 						</div>
-					</a>
+					</div>
 				))}
 			</div>
 		) : (
+			<!-- État vide -->
 			<div class="text-center py-20">
-				<div class="text-6xl mb-4">👓</div>
+				<div class="text-6xl mb-6">👓</div>
 				<h2 class="text-2xl font-semibold text-bleu-marine mb-3">Aucune création pour le moment</h2>
-				<p class="text-gris-taupe mb-8">Commence par créer ta première paire de lunettes personnalisée</p>
-				<a href="/configurateur" class="btn-primary inline-block">
+				<p class="text-gris-taupe mb-8 max-w-md mx-auto">
+					Commence par créer ta première paire de lunettes personnalisée avec notre configurateur intuitif
+				</p>
+				<a href="/configurateur" class="btn-primary inline-flex items-center gap-2 text-lg px-8 py-4">
+					<svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+						<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"/>
+					</svg>
 					Créer mes lunettes
 				</a>
 			</div>
 		)}
+		
+		<!-- Tips section -->
+		{creations.length > 0 && (
+			<section class="mt-20 bg-gradient-to-r from-beige-lin to-blanc-casse rounded-2xl p-8">
+				<div class="flex items-start gap-6">
+					<div class="text-4xl">💡</div>
+					<div>
+						<h3 class="text-xl font-semibold text-bleu-marine mb-2">Le saviez-vous ?</h3>
+						<p class="text-gris-taupe mb-4">
+							Vous pouvez dupliquer une création existante pour créer des variantes rapidement, 
+							ou utiliser notre IA pour générer de nouvelles combinaisons basées sur vos goûts.
+						</p>
+						<a href="/configurateur" class="text-bleu-marine hover:text-brun-clair font-medium inline-flex items-center gap-2">
+							Essayer le configurateur IA
+							<svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+								<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"/>
+							</svg>
+						</a>
+					</div>
+				</div>
+			</section>
+		)}
 	</main>
 </Layout>
+
+<script>
+	// Duplication
+	document.querySelectorAll('.duplicate-btn').forEach(btn => {
+		btn.addEventListener('click', async (e) => {
+			const id = e.currentTarget.dataset.id;
+			const originalName = e.currentTarget.dataset.name;
+			const newName = prompt(`Nom de la copie de "${originalName}" :`, `${originalName} (copie)`);
+			
+			if (!newName) return;
+			
+			// Désactiver le bouton
+			e.currentTarget.disabled = true;
+			e.currentTarget.innerHTML = '<span class="animate-spin">⏳</span>';
+			
+			try {
+				const res = await fetch('/api/duplicateLunettes', {
+					method: 'POST',
+					headers: { 'Content-Type': 'application/json' },
+					credentials: 'include',
+					body: JSON.stringify({ id, newName })
+				});
+				
+				const data = await res.json();
+				
+				if (data.success) {
+					window.location.href = `/produit?id=${data.newId}`;
+				} else {
+					throw new Error(data.error);
+				}
+			} catch (error) {
+				console.error(error);
+				alert('❌ Erreur : ' + error.message);
+				e.currentTarget.disabled = false;
+				e.currentTarget.innerHTML = '<svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 16H6a2 2 0 01-2-2V6a2 2 0 012-2h8a2 2 0 012 2v2m-6 12h8a2 2 0 002-2v-8a2 2 0 00-2-2h-8a2 2 0 00-2 2v8a2 2 0 002 2z"/></svg>';
+			}
+		});
+	});
+	
+	// Suppression
+	document.querySelectorAll('.delete-btn').forEach(btn => {
+		btn.addEventListener('click', async (e) => {
+			const id = e.currentTarget.dataset.id;
+			const name = e.currentTarget.dataset.name;
+			
+			if (!confirm(`⚠️ Supprimer "${name}" définitivement ?`)) return;
+			
+			// Désactiver le bouton
+			e.currentTarget.disabled = true;
+			e.currentTarget.innerHTML = '<span class="animate-spin">⏳</span>';
+			
+			try {
+				const res = await fetch('/api/deleteLunettes', {
+					method: 'POST',
+					headers: { 'Content-Type': 'application/json' },
+					credentials: 'include',
+					body: JSON.stringify({ id })
+				});
+				
+				if (res.ok) {
+					// Animation de suppression
+					const card = e.currentTarget.closest('.card');
+					card.style.opacity = '0';
+					card.style.transform = 'scale(0.9)';
+					setTimeout(() => {
+						location.reload();
+					}, 300);
+				} else {
+					throw new Error('Erreur de suppression');
+				}
+			} catch (error) {
+				console.error(error);
+				alert('❌ Erreur lors de la suppression');
+				e.currentTarget.disabled = false;
+				e.currentTarget.innerHTML = '<svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"/></svg>';
+			}
+		});
+	});
+</script>
+
+<style>
+	/* Animation de rotation pour le spinner */
+	@keyframes spin {
+		to { transform: rotate(360deg); }
+	}
+	.animate-spin {
+		animation: spin 1s linear infinite;
+	}
+	
+	/* Transition smooth sur les cartes */
+	.card {
+		transition: opacity 0.3s, transform 0.3s;
+	}
+</style>

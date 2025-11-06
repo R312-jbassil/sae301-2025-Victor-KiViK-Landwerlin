@@ -11,6 +11,9 @@ const navItems = [
 	{ label: 'L\'atelier', href: '/atelier', id: 'atelier' },
 	{ label: 'Contact', href: '/contact', id: 'contact' },
 ];
+
+// Récupérer l'utilisateur depuis les locals (middleware)
+const user = Astro.locals.user;
 ---
 
 <header class="bg-beige-lin h-[100px] px-20 flex items-center justify-between shadow-sm sticky top-0 z-50">
@@ -32,8 +35,45 @@ const navItems = [
 		))}
 	</nav>
 	
-	<!-- CTA Button -->
-	<a href="/compte" class="btn-primary">
-		Mon compte
-	</a>
+	<!-- CTA Button / User Menu -->
+	{user ? (
+		<div class="flex items-center gap-4">
+			<div class="flex flex-col items-end">
+				<span class="text-sm font-medium text-bleu-marine">👋 {user.name}</span>
+				<span class="text-xs text-gris-taupe">{user.email}</span>
+			</div>
+			<button id="logout-btn" class="px-4 py-2 border-2 border-bleu-marine text-bleu-marine rounded-lg hover:bg-bleu-marine hover:text-white transition-all">
+				Déconnexion
+			</button>
+		</div>
+	) : (
+		<a href="/compte" class="btn-primary">
+			Mon compte
+		</a>
+	)}
 </header>
+
+{user && (
+	<script>
+		document.getElementById('logout-btn')?.addEventListener('click', async () => {
+			if (!confirm('Êtes-vous sûr de vouloir vous déconnecter ?')) return;
+			
+			try {
+				const res = await fetch('/api/logout', {
+					method: 'POST',
+					credentials: 'include'
+				});
+				
+				if (res.ok) {
+					localStorage.removeItem('user');
+					window.location.href = '/';
+				} else {
+					alert('❌ Erreur de déconnexion');
+				}
+			} catch (error) {
+				console.error('Erreur logout:', error);
+				alert('❌ Erreur réseau');
+			}
+		});
+	</script>
+)}
