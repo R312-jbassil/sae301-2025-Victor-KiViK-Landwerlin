@@ -1,4 +1,3 @@
 admin pocketbase : landwerlinvictor4@gmail.com mdp: sae301pocketbase
 
-github depot : https://github.com/R312-jbassil/sae301-2025-Victor-KiViK-Landwerlin
-
+github dépot : https://github.com/R312-jbassil/sae301-2025-Victor-KiViK-Landwerlin
